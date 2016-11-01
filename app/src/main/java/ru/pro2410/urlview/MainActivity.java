@@ -7,6 +7,7 @@ import android.view.View;
 import android.widget.Button;
 import android.widget.EditText;
 import android.widget.LinearLayout;
+import android.widget.ProgressBar;
 import android.widget.ScrollView;
 import android.widget.TextView;
 import android.widget.Toast;
@@ -21,31 +22,33 @@ import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
 public class MainActivity extends AppCompatActivity {
-    Button parseButton;
-    EditText editText;
-    TextView textHtml;
-    LinearLayout linearLayout;
-    ScrollView scrollView;
-    String URL_REGEX = null;
+    private Button btnParseHtml;
+    private EditText edtEnterUrl;
+    private TextView textHtml;
+    private LinearLayout linearLayout;
+    private ScrollView scrollView;
+    private String url_regex;
+    private ProgressBar pbCircleLoading;
+    private static final int TIMEOUT = 5000;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
 
-        URL_REGEX = getString(R.string.URLRegex);
-        parseButton = (Button) findViewById(R.id.parseButton);
-        editText = (EditText) findViewById(R.id.editText);
-
+        url_regex = getString(R.string.URLRegex);
+        btnParseHtml = (Button) findViewById(R.id.parseButton);
+        edtEnterUrl = (EditText) findViewById(R.id.editText);
         linearLayout = (LinearLayout) findViewById(R.id.idLinear);
         scrollView = (ScrollView) findViewById(R.id.idScroll);
         textHtml = (TextView) findViewById(R.id.idText);
+        pbCircleLoading = (ProgressBar) findViewById(R.id.pbCircleLoading);
 
-        parseButton.setOnClickListener(new View.OnClickListener() {
+        btnParseHtml.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                String str = editText.getText().toString();
-                if (!checkUrl(str)){
+                String str = edtEnterUrl.getText().toString();
+                if (!isValidUrl(str)){
 
                     String message = "Введите url. Например https://yandex.ru/";
                     Toast.makeText(MainActivity.this, message,Toast.LENGTH_SHORT).show();
@@ -53,25 +56,29 @@ public class MainActivity extends AppCompatActivity {
                 }
                 linearLayout.setVisibility(View.GONE);
                 scrollView.setVisibility(View.VISIBLE);
-                new GetHtmlTask().execute(str);
-
+                new LoadHtmlTask().execute(str);
             }
         });
     }
-    boolean checkUrl(String str){
-        Pattern p = Pattern.compile(URL_REGEX);
+    private boolean isValidUrl(String str){
+        Pattern p = Pattern.compile(url_regex);
         Matcher m = p.matcher(str);
         return m.matches();
     }
 
-    class GetHtmlTask extends AsyncTask<String,Void,String>{
+    private class LoadHtmlTask extends AsyncTask<String,Void,String>{
+        @Override
+        protected void onPreExecute() {
+            pbCircleLoading.setVisibility(View.VISIBLE);
+        }
+
         @Override
         protected String doInBackground(String... params) {
             StringBuilder html = null;
             try {
                 URLConnection connection = (new URL(params[0])).openConnection();
-                connection.setConnectTimeout(5000);
-                connection.setReadTimeout(5000);
+                connection.setConnectTimeout(TIMEOUT);
+                connection.setReadTimeout(TIMEOUT);
                 connection.connect();
 
                 InputStream in = connection.getInputStream();
@@ -94,7 +101,8 @@ public class MainActivity extends AppCompatActivity {
 
         @Override
         protected void onPostExecute(String s) {
-           textHtml.setText(s);
+            pbCircleLoading.setVisibility(View.GONE);
+            textHtml.setText(s);
         }
     }
 }

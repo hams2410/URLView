@@ -20,6 +20,15 @@
             android:layout_width="match_parent"
             android:layout_height="wrap_content"/>
     </ScrollView>
+    <ProgressBar
+        android:visibility="gone"
+        android:id="@+id/pbCircleLoading"
+        android:layout_centerVertical="true"
+        android:layout_centerHorizontal="true"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:indeterminate="true">
+    </ProgressBar>
     <LinearLayout
         android:id="@+id/idLinear"
         android:layout_width="150dp"
