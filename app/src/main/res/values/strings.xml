@@ -1,0 +1,6 @@
+<resources>
+    <string name="app_name">URL View</string>
+    <string name="tip">Введите URL</string>
+    <string name="parse">Получить html</string>
+    <string name="URLRegex">^https?://(www\\.)?[a-z0-9-]+(\\.[a-z0-9-]+)+([/?].*)?$</string>
+</resources>
